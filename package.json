@@ -1,0 +1,17 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "UpTask Backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "NodeJs",
+    "TypeScript",
+    "MongoDB",
+    "Express"
+  ],
+  "author": "Jose Castillo @jmcadev",
+  "license": "ISC"
+}
