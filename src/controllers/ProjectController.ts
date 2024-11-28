@@ -18,7 +18,11 @@ export class ProjectController {
 
     static getAllProjects = async (req: Request, res: Response) => {
         try {
-            const projects = await Project.find({})
+            const projects = await Project.find({
+                $or: [
+                    {manager: {$in: req.user.id}}
+                ]
+            })
             res.json(projects)
         } catch (error) {
             res.status(500).json({error: error})
@@ -26,15 +30,44 @@ export class ProjectController {
     }
 
     static getProjectById = async(req: Request, res: Response) => {
+        const { projectId } = req.params
         try {
-            res.status(200).json(req.project)
+            const project = await Project.findById(projectId).populate("tasks")
+            if(!project){
+                const error = new Error("Proyecto no encontrado")
+                res.status(404).json({error: error.message})
+                return 
+            }
+
+            if(project.manager.toString() !== req.user.id.toString()){
+                const error = new Error("Accion no valida")
+                res.status(403).json({error: error.message})
+                return
+            }
+
+            res.json(project)
         } catch (error) {
-            res.status(500).json({error: error})
+            console.log(error)
         }
     }
 
     static updateProject = async (req: Request, res: Response) => {
+
+        const { projectId } = req.params 
+
         try {
+            const project = await Project.findById(projectId)
+            if(!project){
+                const error = new Error("Proyecto no encontrado")
+                res.status(404).json({error: error.message})
+                return
+            }
+
+            if(project.manager.toString() !== req.user.id.toString()){
+                const error = new Error("Accion no valida, Solo el manager puede actualizar un proyecto")
+                res.status(403).json({error: error.message})
+                return
+            }
 
             req.project.projectName = req.body.projectName
             req.project.clientName = req.body.clientName
@@ -48,7 +81,22 @@ export class ProjectController {
     }
 
     static deleteProject = async(req: Request, res: Response) => {
+
+        const { projectId } = req.params 
         try {
+            const project = await Project.findById(projectId)
+            if(!project){
+                const error = new Error("Proyecto no encontrado")
+                res.status(404).json({error: error.message})
+                return
+            }
+
+            if(project.manager.toString() !== req.user.id.toString()){
+                const error = new Error("Accion no valida, Solo el manager puede eliminar un proyecto")
+                res.status(403).json({error: error.message})
+                return
+            }
+
             await req.project.deleteOne()
             res.send("Proyecto Eliminado")
 

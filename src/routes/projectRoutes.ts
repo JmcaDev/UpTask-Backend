@@ -9,12 +9,14 @@ import { authenticate } from "../middleware/auth"
 
 const router = Router()
 
+//Autenticar Usuario
+router.use(authenticate)
+
 //Middleware
 router.param("projectId", projectExists)
 
 //POST - Create Project
 router.post("/",
-    authenticate,
     body("projectName").notEmpty().withMessage("El nombre del Proyecto es obligatorio"),    
     body("clientName").notEmpty().withMessage("El nombre del cliente es obligatorio"),    
     body("description").notEmpty().withMessage("la descripcion del proyecto es obligatoria"),
@@ -23,7 +25,7 @@ router.post("/",
 )
 
 //GET - Get Projects
-router.get("/", ProjectController.getAllProjects)
+router.get("/",ProjectController.getAllProjects)
 
 //GET - Get project by id
 router.get("/:projectId", 
