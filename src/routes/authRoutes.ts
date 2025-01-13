@@ -79,4 +79,15 @@ router.get("/user",
     AuthController.user
 )
 
+/** Profile */
+router.put("/profile",
+    authenticate,
+    body("name")
+        .notEmpty().withMessage("El nombre no puede ir vacio"),
+    body("email")
+        .notEmpty().withMessage("El email no puede ir vacio").isEmail().withMessage("Email no valido"),
+    handleInputErrors,
+    AuthController.updateProfile
+)
+
 export default router
